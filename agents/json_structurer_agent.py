@@ -2,6 +2,7 @@ import json
 import re
 from models.openai_models import get_open_ai_json
 
+
 def json_structurer_agent(state):
     llm = get_open_ai_json()
 
@@ -22,21 +23,16 @@ def json_structurer_agent(state):
         "Return only valid JSON output without any additional text or explanation."
     )
 
+    response = llm(prompt)
 
-    # Call OpenAI API
-    response = llm(prompt)  
-
-    # Debugging - Print raw response
     response_text = response.choices[0].message.content.strip()
     print("\n🔹 OpenAI API Response (Raw):")
     print(response_text)
 
-    # Try extracting JSON from Markdown code block (```json ... ```)
     match = re.search(r'```json\n(.*?)\n```', response_text, re.DOTALL)
     if match:
         cleaned_json = match.group(1)
     else:
-        # Try extracting the first valid JSON object in response
         json_match = re.search(r'({.*})', response_text, re.DOTALL)
         if json_match:
             cleaned_json = json_match.group(1)
@@ -44,15 +40,12 @@ def json_structurer_agent(state):
             print("❌ ERROR: OpenAI did not return JSON in a recognizable format.")
             return {"error": "No valid JSON detected in OpenAI response"}
 
-    # Debugging - Print cleaned JSON
     print("\n🔹 Extracted JSON (Cleaned):")
     print(cleaned_json)
 
-    # Convert cleaned string to JSON
     try:
         structured_output = json.loads(cleaned_json)
-        # Store structured data in state
-        state["structured_data"] = structured_output  
+        state["structured_data"] = structured_output
         return structured_output
     except json.JSONDecodeError:
         print("❌ ERROR: Failed to parse structured data response.")

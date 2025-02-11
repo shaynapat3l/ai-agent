@@ -1,11 +1,11 @@
 import openai
 import yaml
 
-# Load API key
-with open("config/config.yml", "r") as file:
+with open("config/config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
-def get_open_ai_json(temperature=0, model="gpt-4-turbo"):
+
+def get_open_ai_json(temperature=0, model="gpt-4o-mini"):
     client = openai.OpenAI(api_key=config["openai_api_key"])
 
     def llm_call(prompt):
@@ -17,13 +17,8 @@ def get_open_ai_json(temperature=0, model="gpt-4-turbo"):
             ],
             temperature=temperature,
             # Force JSON-only output
-            response_format={"type": "json_object"}  
+            response_format={"type": "json_object"}
         )
         return response
 
     return llm_call
-
-
-
-
-
